@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worlds Yoyos App</title>
+    <style>
+        /* Reset some default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        /* Taskbar Style */
+        .taskbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        .taskbar span {
+            font-weight: bold;
+        }
+
+        /* Main Container */
+        .container {
+            margin-top: 60px; 
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        /* Button Style */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn:active {
+            background-color: #00408b;
+        }
+
+        .content {
+            margin-top: 20px;
+        }
+
+        .input-field {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .video-list {
+            margin-top: 20px;
+            list-style-type: none;
+        }
+
+        .video-item {
+            background-color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .video-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Animations for Tab Transitions */
+        .tab-content {
+            display: none;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .tab-content.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Upload Section */
+        .upload-tab {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .upload-tab.show {
+            display: block;
+        }
+
+        /* Chatbot Container */
+        .chat-container {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .chat-box {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .chat-box div {
+            margin-bottom: 10px;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <span>Worlds Yoyos App</span>
+    </div>
+
+    <div class="container">
+        <h1>Worlds Yoyos App</h1>
+
+        <div class="content">
+            <!-- Buttons for Tabs -->
+            <button class="btn" id="registerBtn">Create Account</button>
+            <button class="btn" id="loginBtn">Login</button>
+            <button class="btn" id="logoutBtn" style="display:none;">Logout</button>
+            <button class="btn" id="uploadBtn">Upload Video</button>
+            <button class="btn" id="viewVideosBtn">View Videos</button>
+        </div>
+
+        <!-- Account Creation Form -->
+        <div class="tab-content" id="registerTab">
+            <h2>Create Your Account</h2>
+            <input type="text" id="usernameInput" class="input-field" placeholder="Enter Username">
+            <input type="password" id="passwordInput" class="input-field" placeholder="Enter Password">
+            <button class="btn" id="submitRegisterBtn">Submit</button>
+        </div>
+
+        <!-- Login Form -->
+        <div class="tab-content" id="loginTab">
+            <h2>Login</h2>
+            <input type="text" id="loginUsername" class="input-field" placeholder="Enter Username">
+            <input type="password" id="loginPassword" class="input-field" placeholder="Enter Password">
+            <button class="btn" id="submitLoginBtn">Login</button>
+        </div>
+
+        <!-- Video Section -->
+        <div class="tab-content" id="videoTab">
+            <h2>Available Videos</h2>
+            <ul id="videoList" class="video-list"></ul>
+        </div>
+
+        <!-- Upload Tab (Separate Tab for Upload) -->
+        <div class="upload-tab" id="uploadTab">
+            <h2>Upload a New Video</h2>
+            <input type="text" id="videoTitle" class="input-field" placeholder="Enter Video Title">
+            <input type="text" id="videoUploader" class="input-field" placeholder="Enter Uploader Name">
+            <input type="file" id="videoFile" class="input-field" accept="video/*">
+            <input type="text" id="videoUrl" class="input-field" placeholder="Enter Video URL (Optional)">
+            <button class="btn" id="submitUploadBtn">Upload</button>
+            <div id="uploadedVideoInfo"></div>
+        </div>
+
+        <!-- Chatbot Interface -->
+        <div class="chat-container" id="chatBot" style="display:none;">
+            <h2>AI Yoyo Bot</h2>
+            <div class="chat-box" id="chatBox"></div>
+            <input type="text" id="chatInput" class="chat-input" placeholder="Ask me anything..." />
+            <button class="btn" id="sendMessageBtn">Send</button>
+        </div>
+    </div>
+
+    <script>
+        class User {
+            constructor(username, password) {
+                this.username = username;
+                this.passwordHash = this.hashPassword(password);
+                this.points = 0;
+                this.completedVideos = new Set();
+            }
+
+            hashPassword(password) {
+                return crypto.subtle.digest('SHA-256', new TextEncoder().encode(password))
+                    .then(hashBuffer => {
+                        return Array.from(new Uint8Array(hashBuffer))
+                            .map(b => b.toString(16).padStart(2, '0')).join('');
+                    });
+            }
+
+            async authenticate(password) {
+                const hash = await this.hashPassword(password);
+                return this.passwordHash === hash;
+            }
+
+            watchVideo(video) {
+                if (!this.completedVideos.has(video.title)) {
+                    this.completedVideos.add(video.title);
+                    this.points += video.points;
+                    alert(`${this.username} earned ${video.points} points for watching! Total points: ${this.points}`);
+                } else {
+                    alert("You have already watched this video!");
+                }
+            }
+
+            performTrick(video, success) {
+                if (this.completedVideos.has(video.title)) {
+                    if (success) {
+                        this.points += 10;
+                        alert(`${this.username} successfully performed the trick and earned 10 extra points! Total points: ${this.points}`);
+                    } else {
+                        alert(`${this.username} failed the trick attempt. No extra points awarded.`);
+                    }
+                } else {
+                    alert("Please watch the video before attempting the trick!");
+                }
+            }
+        }
+
+        class Video {
+            constructor(title, uploader, points, url, file) {
+                this.title = title;
+                this.uploader = uploader;
+                this.points = points;
+                this.url = url;
+                this.file = file;
+            }
+        }
+
+        class WorldsYoyosApp {
+            constructor() {
+                this.users = new Map();
+                this.videos = [];
+                this.currentUser = null;
+                this.loadUser();
+            }
+
+            loadUser() {
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    this.currentUser = JSON.parse(savedUser);
+                    this.showTab('videoTab');
+                    document.getElementById('logoutBtn').style.display = 'inline';
+                    document.getElementById('registerBtn').style.display = 'none';
+                    document.getElementById('loginBtn').style.display = 'none';
+                } else {
+                    this.showTab('registerTab');
+                    document.getElementById('logoutBtn').style.display = 'none';
+                    document.getElementById('registerBtn').style.display = 'inline';
+                    document.getElementById('loginBtn').style.display = 'inline';
+                }
+            }
+
+            registerUser(username, password) {
+                if (!this.users.has(username)) {
+                    const user = new User(username, password);
+                    this.users.set(username, user);
+                    this.currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user)); // Save to localStorage
+                    alert(`User '${username}' registered successfully.`);
+                    this.showTab('videoTab');
+                    document.getElementById('logoutBtn').style.display = 'inline';
+                    document.getElementById('registerBtn').style.display = 'none';
+                    document.getElementById('loginBtn').style.display = 'none';
+                } else {
+                    alert("Username already exists.");
+                }
+            }
+
+            loginUser(username, password) {
+                const user = this.users.get(username);
+                if (user) {
+                    user.authenticate(password).then(isAuthenticated => {
+                        if (isAuthenticated) {
+                            this.currentUser = user;
+                            localStorage.setItem('currentUser', JSON.stringify(user)); // Save to localStorage
+                            alert("Login successful.");
+                            this.showTab('videoTab');
+                            document.getElementById('logoutBtn').style.display = 'inline';
+                            document.getElementById('registerBtn').style.display = 'none';
+                            document.getElementById('loginBtn').style.display = 'none';
+                        } else {
+                            alert("Invalid password.");
+                        }
+                    });
+                } else {
+                    alert("Username not found.");
+                }
+            }
+
+            logoutUser() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser'); // Remove from localStorage
+                alert('Logged out');
+                this.showTab('registerTab');
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('registerBtn').style.display = 'inline';
+                document.getElementById('loginBtn').style.display = 'inline';
+            }
+
+            uploadVideo(title, uploader, file, url) {
+                const video = new Video(title, uploader, 10, url, file);
+                this.videos.push(video);
+                this.displayVideos();
+                alert("Video uploaded successfully.");
+            }
+
+            displayVideos() {
+                const videoList = document.getElementById("videoList");
+                videoList.innerHTML = '';
+                this.videos.forEach((video, index) => {
+                    const videoItem = document.createElement('li');
+                    videoItem.classList.add('video-item');
+                    videoItem.innerHTML = `${video.title} by ${video.uploader}`;
+                    videoList.appendChild(videoItem);
+                });
+            }
+
+            showTab(tabId) {
+                const tabs = document.querySelectorAll('.tab-content');
+                tabs.forEach(tab => tab.classList.remove('show'));
+                const tab = document.getElementById(tabId);
+                tab.classList.add('show');
+            }
+
+            sendBotMessage(message) {
+                const chatBox = document.getElementById('chatBox');
+                const botMessage = this.getBotResponse(message);
+                chatBox.innerHTML += `<div>User: ${message}</div><div>Bot: ${botMessage}</div>`;
+            }
+
+            getBotResponse(message) {
+                if (message.includes('trick')) {
+                    return "Try the advanced yoyo trick!";
+                } else if (message.includes('yoyo')) {
+                    return "A yoyo is a toy with an axle connected to two discs!";
+                } else {
+                    return "Ask me anything about yoyos!";
+                }
+            }
+        }
+
+        const app = new WorldsYoyosApp();
+
+        // Event Listeners
+        document.getElementById('registerBtn').onclick = () => app.showTab('registerTab');
+        document.getElementById('loginBtn').onclick = () => app.showTab('loginTab');
+        document.getElementById('logoutBtn').onclick = () => app.logoutUser();
+        document.getElementById('submitRegisterBtn').onclick = () => {
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+            app.registerUser(username, password);
+        };
+        document.getElementById('submitLoginBtn').onclick = () => {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            app.loginUser(username, password);
+        };
+        document.getElementById('uploadBtn').onclick = () => app.showTab('uploadTab');
+        document.getElementById('submitUploadBtn').onclick = () => {
+            const title = document.getElementById('videoTitle').value;
+            const uploader = document.getElementById('videoUploader').value;
+            const file = document.getElementById('videoFile').files[0];
+            const url = document.getElementById('videoUrl').value;
+            app.uploadVideo(title, uploader, file, url);
+        };
+
+        // Initialize Chat Bot
+        document.getElementById('sendMessageBtn').onclick = () => {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value;
+            app.sendBotMessage(message);
+            chatInput.value = '';
+        };
+    </script>
+</body>
+</html>
